@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 
 const App = () => {
-    const [count, setCount] = useState(0);
+    // Initialize state.
+    const [count, setCount] = useState(0);  // initial state of 0, returns count and setCount.
 
     const handleIncrementByTen = () => {
         setCount(count + 10);
