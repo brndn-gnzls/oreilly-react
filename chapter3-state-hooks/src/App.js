@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 // const App = () => {
 //     // Initialize state.
@@ -67,36 +67,74 @@ import React, {useState} from 'react';
 
 
 /* -- Conditional State -- */
-const Dashboard = () => {
-    // isLoggedIn managed using the useState Hook.
-    // This variable tracks if the user is currently logged in or not.
-    const [isLoggedIn, setIsLoggedIn] = useState(false);    // initial value of isLoggedIn == false
+// const Dashboard = () => {
+//     // isLoggedIn managed using the useState Hook.
+//     // This variable tracks if the user is currently logged in or not.
+//     const [isLoggedIn, setIsLoggedIn] = useState(false);    // initial value of isLoggedIn == false
 
-    const handleLogin = () => {
-        setIsLoggedIn(true);
-    }
+//     const handleLogin = () => {
+//         setIsLoggedIn(true);
+//     }
 
-    const handleLogout = () => {
-        setIsLoggedIn(false);
-    }
+//     const handleLogout = () => {
+//         setIsLoggedIn(false);
+//     }
 
-    // Braces are used to wrap conditionals.
-    return (
-        <div>
-            {isLoggedIn ? (<button onClick={handleLogout}>Logout</button>) :
-                          (<button onClick={handleLogin}>Login</button>)}
-            {isLoggedIn && <p>Hey friend, welcome!</p>}
-            {!isLoggedIn && <p>Please log in to continue.</p>}
-        </div>
-    )
-}
+//     // Braces are used to wrap conditionals.
+//     return (
+//         <div>
+//             {isLoggedIn ? (<button onClick={handleLogout}>Logout</button>) :
+//                           (<button onClick={handleLogin}>Login</button>)}
+//             {isLoggedIn && <p>Hey friend, welcome!</p>}
+//             {!isLoggedIn && <p>Please log in to continue.</p>}
+//         </div>
+//     )
+// }
 
+// const App = () => {
+//     return (
+//         <>
+//             <Dashboard />
+//         </>
+//     )
+// }
+
+/* -- useEffect Hook -- */
 const App = () => {
+    // State object set with an empty array as the initial data.
+    const [data, setData] = useState([]);
+
+    // Get data.
+    useEffect(() => {
+        const API_URL = "https://dummyjson.com/users";
+
+        const fetchSpeakers = async () => {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                setData(data.users);
+            } catch (error) {
+                console.log("error", error);
+            }
+        };
+
+        fetchSpeakers();
+    // Second argument, dependency, empty array. Ensures that useEffect()
+    // renders only once on mounting. Unless the dependency changes
+    // no re-rending occurs.
+    }, []);
+
     return (
         <>
-            <Dashboard />
+            <ul>
+                {data.map(item => (
+                    <li key={item.id}>
+                        {item.firstName} {item.lastName}
+                    </li>
+                ))}
+            </ul>
         </>
-    )
-}
-
+    );
+};
 export default App;
