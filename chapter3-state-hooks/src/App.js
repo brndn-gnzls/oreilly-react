@@ -113,6 +113,7 @@ const App = () => {
                 const response = await fetch(API_URL);
                 const data = await response.json();
 
+                // Sets the data in the component's state.
                 setData(data.users);
             } catch (error) {
                 console.log("error", error);
@@ -120,10 +121,10 @@ const App = () => {
         };
 
         fetchSpeakers();
-    // Second argument, dependency, empty array. Ensures that useEffect()
-    // renders only once on mounting. Unless the dependency changes
-    // no re-rending occurs.
-    }, []);
+        // Second argument, dependency, empty array. Ensures that useEffect()
+        // renders only once on mounting. Unless the dependency changes
+        // no re-rending occurs.
+    }, []); // set dependency as data
 
     return (
         <>
