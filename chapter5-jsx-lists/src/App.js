@@ -1,25 +1,13 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default function App() {
+    const speakerName = 'John Holt'
+
+    return (
+        <div className='App'>
+            <h1>React Conference 2024</h1>
+            <h2>{speakerName}</h2>
+            <h2>{5 + 5}</h2>
+        </div>
+    )
 }
-
-export default App;

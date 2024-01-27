@@ -6,15 +6,9 @@ import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  /**
-   * div - type of HTML element to create.
-   * {} - represents props, can be an object or null.
-   * 'React Con...' - desired browser display.
-   */
-  // React.createElement('div', {}, 'React Conference 2024')
-  < React.StrictMode >
+  <React.StrictMode>
     <App />
-  </React.StrictMode >
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
