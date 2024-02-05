@@ -28,28 +28,93 @@ class Venue(db.Model):
 def index():
     return "Welcome to Byzza REST API Server"
 
-# Using jsonify to convert Python data structures
-# into JSON format.
-@app.route("/api/v1/venues")
-def venues():
-    return jsonify({"id":1, "name":"Auditorium A"}), 404
+#
+# Venue routes
+#
 
+# Post entry.
 @app.route("/api/v1/venues", methods=['POST'])
 def add_venues(): # Invoked on POST request.
 
     if request.method == 'POST':
         name = request.get_json().get('name')
         all_venues = Venue.query.filter_by(name=name).first()
-    if all_venues:
-        return jsonify(message="Venue name already exist!"), 409
-    else:
-        venue = Venue(name=name)
-        db.session.add(venue)
+
+        if all_venues:
+            # 409 - content conflict.
+            return jsonify(message="Venue name already exist!"), 409
+        else:
+            venue = Venue(name=name)
+            db.session.add(venue)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'venues': venue.format()
+            }), 201
+
+# Get all entries.
+@app.route("/api/v1/venues", methods=['GET'])
+def retrieve_venues():
+    if request.method == 'GET':
+        all_venues = Venue.query.all() # SQLA query.
+        
+        if all_venues:
+            return jsonify({
+                'success': True,
+                'venues': [venue.format() for venue in all_venues]
+            }), 200
+
+        return jsonify(message="No venue record found"), 404
+        
+# Get single entry.
+@app.route("/api/v1/venues/<int:id>", methods=['GET'])
+def retrieve_venue(id):
+    if request.method == 'GET':
+        venue = Venue.query.filter(Venue.id == id).first() # Retrieves first record.
+
+        if venue:
+            return jsonify({
+                'success': True,
+                'venue': venue.format()
+            }), 200
+
+        return jsonify(message="Record id not found"), 404
+
+# Update entry.
+@app.route("/api/v1/venues/<int:id>", methods=['PUT'])
+def update_venue(id):
+    if request.method == 'PUT':
+        name = request.get_json().get('name')
+        venue = Venue.query.get(id)
+
+        if not venue:
+            return jsonify(message='Venue record not found'), 404
+
+        venue.name = name
         db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'updated venue': venue.format()
+    }), 200
+
+# Delete an entry.
+@app.route("/api/v1/venues/<int:id>", methods=['DELETE'])
+def remove_venue(id):
+    venue = Venue.query.filter_by(id=id).first() # Check for existence of the record id.
+
+    if venue:
+        db.session.delete(venue)
+        db.session.commit()
+
         return jsonify({
             'success': True,
-            'venues': venue.format()
-        }), 201
+            'message': '[+] You deleted a venue',
+            'deleted': venue.format()
+        }), 202
+    else:
+        return jsonify(message="That venue does not exist"), 404
+
 
 
 # Query parameter example.
