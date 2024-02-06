@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+import psycopg2
 from flask_sqlalchemy import SQLAlchemy
 
 # __name__ references the current module name.
@@ -11,6 +12,38 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://app:terminal@localhost:543
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
+# 
+#  MODELS
+# 
+
+# Event Registration Model
+class EventRegistration(db.Model): # dn.Model is a base class for all models in Flask-SQLA
+    __tablename__ = 'attendees'
+
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), unique=True, nullable=False)
+    last_name = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(100), unique=True, nullable=False)
+    job_title = db.Column(db.String(100), unique=True, nullable=False)
+    company_name = db.Column(db.String(100), unique=True, nullable=False)
+    company_size = db.Column(db.String(50), unique=True, nullable=False)
+    subject = db.Column(db.String(250), nullable=False)
+
+    def format(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'phone': self.phone,
+            'job_title':self.job_title,
+            'company_name': self.company_name,
+            'company_size': self.company_size,
+            'subject': self.subject
+        }
+
+# Venue Model
 class Venue(db.Model):
     __tablename__ = 'venues'
     id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +61,47 @@ class Venue(db.Model):
 def index():
     return "Welcome to Byzza REST API Server"
 
+
+#
+# Events Registation routes
+#
+@app.route("/api/v1/events-registration", methods=['POST'])
+def add_attendess():
+    if request.method == 'POST':
+        first_name = request.get_json().get('first_name')
+        last_name = request.get_json().get('last_name')
+        email = request.get_json().get('email')
+        phone = request.get_json().get('phone')
+        job_title = request.get_json().get('job_title')
+        company_name = request.get_json().get('company_name')
+        company_size = request.get_json().get('company_size')
+        subject = request.get_json().get('subject')
+
+        if first_name and last_name and email and phone and subject:
+            all_attendees = EventRegistration.query.filter_by(email=email).first()
+            if all_attendees:
+                return jsonify(message="Email address already in use"), 409
+            else:
+                new_attendee = EventRegistration(
+                    first_name = first_name,
+                    last_name = last_name,
+                    email = email,
+                    phone = phone,
+                    job_title = job_title,
+                    company_name = company_name,
+                    company_size = company_size,
+                    subject = subject
+                )
+                db.session.add(new_attendee)
+                db.session.commit()
+                return jsonify({
+                    'success': True,
+                    'new_attendee': new_attendee.format()
+                }), 201
+        else:
+            return jsonify({
+                'error': 'Invalid input'
+            }), 400
 #
 # Venue routes
 #
