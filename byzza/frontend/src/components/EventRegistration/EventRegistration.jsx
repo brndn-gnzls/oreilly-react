@@ -90,7 +90,7 @@ const EventRegistration = () => {
         setIsSubmitted(true);
     };
 
-    // Render the component
+    // Render the component.
     return (
         <div className="section">
             <div className="form-container">
