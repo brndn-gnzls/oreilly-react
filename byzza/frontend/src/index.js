@@ -1,17 +1,57 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import {
+  createBrowserRouter,
+  RouterProvider,
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+} from "react-router-dom";
+import AdminPage from "./pages/Admin/AdminPage/AdminPage";
+import Dashboard from "./pages/Admin/Dashboard/Dashboard";
+import Speakers from "./pages/Admin/Speakers/Speakers";
+import Venues from "./pages/Admin/Venues/Venues";
+import Schedules from "./pages/Admin/Schedules/Schedules";
+import Sponsors from "./pages/Admin/Sponsors/Sponsors";
+import Events from "./pages/Admin/Events/Events";
+import "./index.css";
+
+
+const router = createBrowserRouter([
+  {
+    path: "/admin",
+    element: <AdminPage/>,
+    children: [
+
+      {
+        path: "/admin/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/admin/speakers",
+        element: <Speakers />,
+      },
+      {
+        path: "/admin/venues",
+        element: <Venues />,
+      },
+      {
+        path: "/admin/events",
+        element: <Events />,
+      },
+      {
+        path: "/admin/schedules",
+        element: <Schedules />,
+      },
+      {
+        path: "/admin/sponsors",
+        element: <Sponsors />,
+      },
+
+    ],
+
+
+  },
+]);
+
+createRoot(document.getElementById("root")).render(
+  <RouterProvider router={router} />
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
