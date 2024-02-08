@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import AdminPage from "./pages/Admin/AdminPage/AdminPage";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
-import Speakers from "./pages/Admin/Speakers/Speakers";
+import CreateSpeaker from "./pages/Admin/Speakers/CreateSpeaker";
 import ViewSpeakers from "./pages/Admin/Speakers/ViewSpeakers";
 import Venues from "./pages/Admin/Venues/Venues";
 import Schedules from "./pages/Admin/Schedules/Schedules";
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin/speakers",
-        element: <ViewSpeakers />,
+        element: <CreateSpeaker />,
       },
       {
         path: "/admin/venues",
