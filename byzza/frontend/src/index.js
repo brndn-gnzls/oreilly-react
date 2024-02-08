@@ -8,6 +8,7 @@ import {
 import AdminPage from "./pages/Admin/AdminPage/AdminPage";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import Speakers from "./pages/Admin/Speakers/Speakers";
+import ViewSpeakers from "./pages/Admin/Speakers/ViewSpeakers";
 import Venues from "./pages/Admin/Venues/Venues";
 import Schedules from "./pages/Admin/Schedules/Schedules";
 import Sponsors from "./pages/Admin/Sponsors/Sponsors";
@@ -17,6 +18,7 @@ import "./index.css";
 
 const router = createBrowserRouter([
   {
+
     path: "/admin",
     element: <AdminPage/>,
     children: [
@@ -27,7 +29,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin/speakers",
-        element: <Speakers />,
+        element: <ViewSpeakers />,
       },
       {
         path: "/admin/venues",

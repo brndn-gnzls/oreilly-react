@@ -1,5 +1,4 @@
 from datetime import datetime
-from app import db
 
 class Speaker(db.Model):
     __tablename__ = 'speakers'
