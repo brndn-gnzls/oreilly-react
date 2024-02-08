@@ -62,42 +62,47 @@ def get_speakers():
     return jsonify([speaker.serialize() for speaker in
         speakers]), 200
 
-# @app.route('/api/v1/speakers', methods=['POST'])
-# def add_speaker():
-#     data = request.get_json()
+@app.route('/api/v1/speakers', methods=['POST'])
+def add_speaker():
+    # Retrieve data fromthe request.
+    data = request.get_json()
 
-#     name = data.get('name')
-#     email = data.get('email')
-#     company = data.get('company')
-#     position = data.get('position')
-#     bio = data.get('bio')
-#     avatar = request.files.get('speaker_avatar')
+    # Extract speaker details.
+    name = data.get('name')
+    email = data.get('email')
+    company = data.get('company')
+    position = data.get('position')
+    bio = data.get('bio')
+    avatar = request.files.get('speaker_avatar')
 
-#     if avatar and allowed_file(avatar.filename):
-#         filename = avatar.filename
-#         avatar.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#     else:
-#         filename = 'default-avatar.gif'
+    # Check for allowed file extensions (jpg, png, etc.)
+    if avatar and allowed_file(avatar.filename):
+        filename = avatar.filename
+        avatar.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    else:
+        filename = 'default-avatar.gif'
 
-#     if not name or not email or not company or not position or not bio:
-#         return jsonify({
-#             "error" : "All fields are required"
-#         }), 400
+    # Check required fields.
+    if not name or not email or not company or not position or not bio:
+        return jsonify({
+            "error" : "All fields are required"
+        }), 400
 
-#     existing_speaker = Speaker.query.filter_by(email=email).first()
+    # Check if the email is already in use.
+    existing_speaker = Speaker.query.filter_by(email=email).first()
+    if existing_speaker:
+        return jsonify({"error":"Speaker with that email alread exists"}), 409
 
-#     if existing_speaker:
-#         return jsonify({"error":"Speaker with that email alread exists"}), 409
+    # Speaker is new.
+    speaker = Speaker(name=name, email=email, company=company, position=position, bio=bio, speaker_avatar=avatar)
 
-#     speaker = Speaker(name=name, email=email, company=company, position=position, bio=bio, speaker_avatar=avatar)
+    db.session.add(speaker)
+    db.session.commit()
 
-#     db.session.add(speaker)
-#     db.session.commit()
+    return jsonify(speaker.serialize()), 201
 
-#     return jsonify(speaker.serialize()), 201
-
-# def allowed_file(filename):
-#     return '.' in filename and filename.rsplit('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 # app.py is the main program.
 if __name__ == "__main__":

@@ -34,14 +34,12 @@ export const getSpeakers = async () => {
 }
 
 // Add speaker
-export const addSpeaker = async (speaker) => {
-    try {
-        setHeaders()
-        const response = await axios.post(`${API_URL}/speakers`, speaker)
-        return response.data
-    } catch(error) {
-        handleErrors(error)
-    }
+export const addSpeaker = async (speakerData) => {
+    const url = `${API_URL}/speakers`
+    return axios
+        .post(url, speakerData, {headers: setHeaders()})
+        .then((response) => response.data)
+        .catch(handleErrors)
 }
 
 // Update speaker
