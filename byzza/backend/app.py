@@ -105,31 +105,38 @@ def allowed_file(filename):
 @app.route('/api/v1/speakers/<int:speaker_id>', methods=['PUT'])
 def update_speaker(speaker_id):
     data = request.get_json()
-    name = data.get('name')
-    email = data.get('email')
-    company = data.get('company')
-    position = data.get('position')
-    bio = data.get('bio')
-    avatar = request.files.get('speaker-avatar')
     speaker = Speaker.query.get(speaker_id)
 
     if not speaker:
         return jsonify({
             "error": "[-] Speaker not found."
         }),404
+    
+    # Required fields
+    name = data.get('name')
+    email = data.get('email')
+    company = data.get('company')
+    position = data.get('position')
+    bio = data.get('bio')
 
+    # Validate required fields are provided
     if not all([name, email, company, position, bio]):
-        return jsonify({
-            "error": "All fields are required"
-        }), 400
+        return jsonify({"error": "All fields except avatar are required"}), 400
 
-    if email != speaker.email:
-        existing_speaker = Speaker.query.filter_by(email=email).first()
+    # Check if the email is already in use by another speaker
+    if speaker.email != data.get('email') and Speaker.query.filter_by(email=data.get('email')).first():
+        return jsonify({"error": "Speaker with that email already exists"}), 409
 
-    if not name or not email or not company or not position or not bio:
-        return jsonify({
-            "error" : "All fields are required"
-        }), 400
+    speaker.name = data.get('name', speaker.name)
+    speaker.email = data.get('email', speaker.email)
+    speaker.company = data.get('company', speaker.company)
+    speaker.position = data.get('position', speaker.position)
+    speaker.bio = data.get('bio', speaker.bio)
+    speaker.speaker_avatar = data.get('speaker_avatar', speaker.speaker_avatar)
+
+    db.session.commit()
+
+    return jsonify(speaker.serialize()), 200
 
 # app.py is the main program.
 if __name__ == "__main__":
