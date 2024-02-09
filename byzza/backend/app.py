@@ -4,6 +4,7 @@ from models import Speaker
 from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import datetime
+from werkzeug.utils import secure_filename
 
 # __name__ references the current module name.
 # Needed for path discovery.
@@ -66,6 +67,30 @@ def add_speaker():
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.rout('/api/v1/speakers/<int:speaker_id>', methods=['PUT'])
+def update_speaker(speaker_id):
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    company = data.get('company')
+    position = data.get('position')
+    bio = data.get('bio')
+    avatar = request.files.get('speaker-avatar')
+    speaker = Speaker.query.get(speaker_id)
+
+    if not speaker:
+        return jsonify({
+            "error": "[-] Speaker not found."
+        }),404
+
+    if not all([name, email, company, position, bio]):
+        return jsonify({
+            "error": "All fields are required"
+        }), 400
+
+    if email != speaker.email:
+        existing_speaker = Speaker.query.filter_by(email=email).first()
 
 # app.py is the main program.
 if __name__ == "__main__":
