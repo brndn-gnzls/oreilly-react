@@ -29,7 +29,8 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin/speakers",
-        element: <CreateSpeaker />,
+        element: <ViewSpeakers />,
+        // element: <CreateSpeaker />,
       },
       {
         path: "/admin/venues",

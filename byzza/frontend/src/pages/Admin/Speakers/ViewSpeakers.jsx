@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {getSpeakers} from '../../../SpeakerAPI.jsx'
 
 const ViewSpeakers = () => {
-    console.log("test")
     const [speakers, setSpeakers] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
