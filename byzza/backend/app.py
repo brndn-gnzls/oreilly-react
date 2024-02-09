@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 import psycopg2
-from models import Speaker
+# from models import Speaker
 from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import datetime
@@ -15,6 +15,40 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://app:terminal@localhost:543
 # Disable sqlalchemy operation nofication settings.
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+from datetime import datetime
+
+class Speaker(db.Model):
+    __tablename__ = 'speakers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    company = db.Column(db.String(100), nullable=False)
+    position = db.Column(db.String(100), nullable=False)
+    bio = db.Column(db.String(200), nullable=False)
+    speaker_avatar = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Built-in to create a string representation of an object.
+    def __repr__(self):
+        return f'<Speaker {self.name}>'
+
+    # Convert the Speaker object into a dictionary format that can
+    # easily be converted into JSON.
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'company': self.company,
+            'position': self.position,
+            'bio': self.bio,
+            'speaker_avatar': self.speaker_avatar,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
 
 
 # Event Registration Model
@@ -68,7 +102,7 @@ def add_speaker():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-@app.rout('/api/v1/speakers/<int:speaker_id>', methods=['PUT'])
+@app.route('/api/v1/speakers/<int:speaker_id>', methods=['PUT'])
 def update_speaker(speaker_id):
     data = request.get_json()
     name = data.get('name')
@@ -91,6 +125,11 @@ def update_speaker(speaker_id):
 
     if email != speaker.email:
         existing_speaker = Speaker.query.filter_by(email=email).first()
+
+    if not name or not email or not company or not position or not bio:
+        return jsonify({
+            "error" : "All fields are required"
+        }), 400
 
 # app.py is the main program.
 if __name__ == "__main__":
