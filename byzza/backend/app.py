@@ -60,6 +60,18 @@ def get_speakers():
     return jsonify([speaker.serialize() for speaker in
         speakers]), 200
 
+@app.route('/api/v1/speakers/<int:speaker_id>', methods=['GET'])
+def get_speaker(speaker_id):
+    speaker = Speaker.query.get(speaker_id)
+
+    if not speaker:
+        return jsonify({
+            "error": "[-] Speaker not found."
+        }),404
+    
+    return jsonify(speaker.serialize()),200
+    
+
 @app.route('/api/v1/speakers', methods=['POST'])
 def add_speaker():
     # Retrieve data fromthe request.

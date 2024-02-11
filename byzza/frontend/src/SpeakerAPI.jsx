@@ -33,6 +33,18 @@ export const getSpeakers = async () => {
     }
 }
 
+// Get single speaker
+export const getSpeaker = async (speakerId) => {
+    try {
+        setHeaders();
+        const response = await axios.get(`${API_URL}/speakers/${speakerId}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        handleErrors(error);
+    }
+};
+
 // Add speaker
 export const addSpeaker = async (speakerData) => {
     const url = `${API_URL}/speakers`
@@ -46,7 +58,7 @@ export const addSpeaker = async (speakerData) => {
 export const updateSpeaker = async(speakerId, updatedSpeaker) => {
     try {
         setHeaders()
-        const response = await axios.get(`${API_URL}/speakers/${speakerId}`, updatedSpeaker)
+        const response = await axios.put(`${API_URL}/speakers/${speakerId}`, updatedSpeaker)
         return response.data
     } catch(error) {
         handleErrors(error)
