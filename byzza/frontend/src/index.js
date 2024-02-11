@@ -8,6 +8,7 @@ import {
 import AdminPage from "./pages/Admin/AdminPage/AdminPage";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import CreateSpeaker from "./pages/Admin/Speakers/CreateSpeaker";
+import UpdateSpeaker from "./pages/Admin/Speakers/UpdateSpeaker";
 import ViewSpeakers from "./pages/Admin/Speakers/ViewSpeakers";
 import Venues from "./pages/Admin/Venues/Venues";
 import Schedules from "./pages/Admin/Schedules/Schedules";
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
         path: "/admin/speakers",
         element: <ViewSpeakers />,
         // element: <CreateSpeaker />,
+      },
+      {
+        path: "/admin/speakers/update/:speakerId",
+        element: <UpdateSpeaker />,
       },
       {
         path: "/admin/venues",

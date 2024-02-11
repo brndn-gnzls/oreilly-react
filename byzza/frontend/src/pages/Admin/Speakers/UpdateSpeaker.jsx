@@ -42,7 +42,7 @@ const UpdateSpeaker = () => {
             await updateSpeaker(speakerId, { name, email, company, position, bio });
             setSuccessMessage('Speaker updated successfully');
             setIsLoading(false);
-            navigate('/path-to-redirect-after-success'); // Adjust the path as needed
+            navigate('/admin/speakers'); // Adjust the path as needed
         } catch (error) {
             setError(error.message);
             setIsLoading(false);
