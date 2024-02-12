@@ -14,6 +14,7 @@ import Venues from "./pages/Admin/Venues/Venues";
 import Schedules from "./pages/Admin/Schedules/Schedules";
 import Sponsors from "./pages/Admin/Sponsors/Sponsors";
 import Events from "./pages/Admin/Events/Events";
+import DeleteSpeaker from "./pages/Admin/Speakers/DeleteSpeaker";
 import "./index.css";
 
 
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/speakers/update/:speakerId",
         element: <UpdateSpeaker />,
+      },
+      {
+        path: "/admin/speakers/delete/:speakerId",
+        element: <DeleteSpeaker />,
       },
       {
         path: "/admin/venues",

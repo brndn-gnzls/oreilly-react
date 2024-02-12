@@ -1,4 +1,6 @@
-from flask import Flask, jsonify, request
+from asyncio import Event
+import http
+from flask import Flask, abort, jsonify, request
 import psycopg2
 # from models import Speaker
 from flask_sqlalchemy import SQLAlchemy
@@ -149,6 +151,25 @@ def update_speaker(speaker_id):
     db.session.commit()
 
     return jsonify(speaker.serialize()), 200
+
+@app.route('/api/v1/speakers/<int:speaker_id>', methods=['DELETE'])
+def delete_speaker(speaker_id):
+    speaker = Speaker.query.get(speaker_id)
+
+    # if not current_user.has_permission("delete_speaker"):
+    #     abort(http.Forbidden("You do not have permission to delete this speaker"))
+
+    # events = Event.query.filter_by(speaker_id=speaker_id).all()
+
+    # if events:
+    #     abort(http.Conflict("this speaker has associated events, please dlete them first"))
+
+    db.session.delete(speaker)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Speaker deleted successfully"
+    }), 200
 
 # app.py is the main program.
 if __name__ == "__main__":

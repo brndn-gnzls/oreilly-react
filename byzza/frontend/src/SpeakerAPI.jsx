@@ -77,12 +77,12 @@ export const deleteSpeaker = async (speakerId) => {
             throw new Error("Speaker not found")
         }
 
-        const eventsResponse = await axios.get(`/api/v1/events?speakerId=${speakerId}`)
-        const events = eventsResponse.data
+        // const eventsResponse = await axios.get(`/api/v1/events?speakerId=${speakerId}`)
+        // const events = eventsResponse.data
 
-        if (events.length > 0) {
-            throw new Error("This speaker has associated events, please delete them first")
-        }
+        // if (events.length > 0) {
+        //     throw new Error("This speaker has associated events, please delete them first")
+        // }
 
         await axios.delete(url)
         return speaker
