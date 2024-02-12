@@ -13,7 +13,7 @@ const UpdateSpeaker = () => {
     const [successMessage, setSuccessMessage] = useState('');
 
     const navigate = useNavigate();
-    const { speakerId } = useParams(); // Assuming you're using URL params to pass speakerId
+    const { speakerId } = useParams(); // URL params passing speakerId
 
     useEffect(() => {
         fetchSpeaker();
@@ -39,10 +39,10 @@ const UpdateSpeaker = () => {
         event.preventDefault();
         setIsLoading(true);
         try {
-            await updateSpeaker(speakerId, { name, email, company, position, bio });
+            await updateSpeaker(speakerId, { name, email, company, position, bio }); // Call to repository.
             setSuccessMessage('Speaker updated successfully');
             setIsLoading(false);
-            navigate('/admin/speakers'); // Adjust the path as needed
+            navigate('/admin/speakers');
         } catch (error) {
             setError(error.message);
             setIsLoading(false);
