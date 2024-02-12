@@ -3,13 +3,18 @@ import {getSpeakers} from '../../../SpeakerAPI.jsx'
 
 const ViewSpeakers = () => {
     const [speakers, setSpeakers] = useState([])
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
 
     const fetchSpeakers = async() => {
+        setIsLoading(true)
         try {
-            const speakerData = await getSpeakers()
-            setSpeakers(speakerData)
+            // Pass the current page to the API call
+            const data = await getSpeakers(currentPage)
+            setSpeakers(data.speakers)
+            setTotalPages(data.total_pages) // Set total pages for pagination controls
             setIsLoading(false)
         } catch (error) {
             setError(error.message)
@@ -19,7 +24,7 @@ const ViewSpeakers = () => {
 
     useEffect(() => {
         fetchSpeakers()
-    }, [])
+    }, [currentPage])
 
     if (isLoading) {
         return <p>Loading Speakers...</p>
@@ -29,10 +34,16 @@ const ViewSpeakers = () => {
         return <p>Error: {error}</p>
     }
 
+    // Handle page change.
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage)
+    }
+
     return (
         <div>
             <h1>Speakers</h1>
             {speakers.length === 0 ? (<p>No speakers found.</p>) : (
+            <>
                 <table>
                     <thead>
                         <tr>
@@ -59,6 +70,16 @@ const ViewSpeakers = () => {
                         ))}
                     </tbody>
                 </table>
+                <div>
+                    {currentPage > 1 && (
+                        <button onClick={() => handlePageChange(currentPage - 1)}>Previous</button>
+                    )}
+                    <span> Page {currentPage} of {totalPages} </span>
+                    {currentPage < totalPages && (
+                        <button onClick={() => handlePageChange(currentPage + 1)}>Next</button>
+                    )}
+                </div>
+            </>
             )}
         </div>
     )

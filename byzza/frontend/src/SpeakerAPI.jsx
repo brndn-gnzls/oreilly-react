@@ -22,12 +22,12 @@ const setHeaders = () => {
 }
 
 // Get speakers
-export const getSpeakers = async () => {
+export const getSpeakers = async (page = 1) => {
     try {
         setHeaders()
-        const response = await axios.get(`${API_URL}/speakers`)
+        const response = await axios.get(`${API_URL}/speakers?page=${page}`)
         console.log(response.data)
-        return response.data
+        return response.data // this includes speakers, total_pages, and total_items
     } catch(error) {
         handleErrors(error)
     }

@@ -3,7 +3,7 @@ import http
 from flask import Flask, abort, jsonify, request
 import psycopg2
 # from models import Speaker
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, pagination
 import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -53,14 +53,29 @@ class Speaker(db.Model):
         }
 
 
-# Event Registration Model
+# @app.route('/api/v1/speakers', methods=['GET'])
+# def get_speakers():
+#     speakers = Speaker.query.all()
+#     if not speakers:
+#         return jsonify({"error": "No speakers found"}), 404
+#     return jsonify([speaker.serialize() for speaker in
+#         speakers]), 200
+
 @app.route('/api/v1/speakers', methods=['GET'])
 def get_speakers():
-    speakers = Speaker.query.all()
-    if not speakers:
-        return jsonify({"error": "No speakers found"}), 404
-    return jsonify([speaker.serialize() for speaker in
-        speakers]), 200
+    page = request.args.get('page', 1, type=int)
+
+    speakers = Speaker.query.paginate(page=page, per_page=5, error_out=False)
+
+    if not speakers.items:
+        return jsonify({"error":"[-] No speakers found."}), 404
+
+    return jsonify({
+        'speakers': [speaker.serialize() for speaker in speakers.items],
+        'total_pages': speakers.pages,
+        'total_items': speakers.total
+    }), 200
+
 
 @app.route('/api/v1/speakers/<int:speaker_id>', methods=['GET'])
 def get_speaker(speaker_id):

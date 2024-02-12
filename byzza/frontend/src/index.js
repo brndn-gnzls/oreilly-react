@@ -27,7 +27,7 @@ const router = createBrowserRouter([
 
       {
         path: "/admin/dashboard",
-        element: <Dashboard />,
+        //element: <Dashboard />,
       },
       {
         path: "/admin/speakers",
@@ -44,19 +44,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin/venues",
-        element: <Venues />,
+        //element: <Venues />,
       },
       {
         path: "/admin/events",
-        element: <Events />,
+       // element: <Events />,
       },
       {
         path: "/admin/schedules",
-        element: <Schedules />,
+        //element: <Schedules />,
       },
       {
         path: "/admin/sponsors",
-        element: <Sponsors />,
+        //element: <Sponsors />,
       },
 
     ],
