@@ -1,7 +1,7 @@
 from asyncio import Event
 import http
 from flask import Flask, abort, jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from flask_bcrypt import bcrypt, Bcrypt
 import psycopg2
 # from models import Speaker
@@ -16,6 +16,8 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://app:terminal@localhost:5432/byzza"
+app.config["JWT_SECRET_KEY"] = "devtestkey"
+jwt = JWTManager(app)
 
 # Disable sqlalchemy operation nofication settings.
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -92,14 +94,14 @@ def login():
             'message': '[!] Missing email or password...'
         }), 400
 
-    user = User.query.filter_by(email=email)
+    user = User.query.filter_by(email=email).first()
 
     if user is None or not bcrypt.check_password_hash(user.password, password):
         return jsonify({
             'message' : '[!] Invalid email or password...'
         }), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=user.user_id)
     return jsonify({
         'access_token': access_token
     }), 200
@@ -108,7 +110,12 @@ def login():
 @jwt_required
 def dashboard():
     current_user = get_jwt_identity()
-    user = User.query.filter_by(id=current_user).first()
+    user = User.query.filter_by(user_id=current_user).first()
+
+    if not user:
+        return jsonify({
+            'message': 'User not found'
+        }), 404
 
     return jsonify({
         'email': user.email
