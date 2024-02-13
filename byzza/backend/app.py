@@ -1,6 +1,8 @@
 from asyncio import Event
 import http
 from flask import Flask, abort, jsonify, request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_bcrypt import bcrypt, Bcrypt
 import psycopg2
 # from models import Speaker
 from flask_sqlalchemy import SQLAlchemy, pagination
@@ -11,6 +13,7 @@ from werkzeug.utils import secure_filename
 # __name__ references the current module name.
 # Needed for path discovery.
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://app:terminal@localhost:5432/byzza"
 
@@ -52,6 +55,68 @@ class Speaker(db.Model):
             'updated_at': self.updated_at.isoformat()
         }
 
+
+#
+# User model
+#
+class User(db.Model):
+
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    roles = db.Column(db.String(100))
+    is_active = db.Column(db.Boolean, default=True)
+    is_superuser = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow())
+
+    def __repr__(self):
+
+        return '<User %r>' % self.username
+
+#
+# login route
+#
+@app.route('/api/v1/login', methods=['POST'])
+def login():
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+
+    if email is None or password is None:
+        return jsonify({
+            'message': '[!] Missing email or password...'
+        }), 400
+
+    user = User.query.filter_by(email=email)
+
+    if user is None or not bcrypt.check_password_hash(user.password, password):
+        return jsonify({
+            'message' : '[!] Invalid email or password...'
+        }), 401
+
+    access_token = create_access_token(identity=user.id)
+    return jsonify({
+        'access_token': access_token
+    }), 200
+
+@app.route('/api/v1/dashboard', methods=['GET'])
+@jwt_required
+def dashboard():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(id=current_user).first()
+
+    return jsonify({
+        'email': user.email
+    }), 200
+    
+#
+# end login route
+#
 
 # @app.route('/api/v1/speakers', methods=['GET'])
 # def get_speakers():
