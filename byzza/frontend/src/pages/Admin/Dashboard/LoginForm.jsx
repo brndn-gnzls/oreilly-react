@@ -1,19 +1,18 @@
 import React, { useState } from "react";
-import Dashboard from "./Dashboard";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const LoginForm = () => {
     const [email, setEmail] = useState('')
-    const [password, setPasswrd] = useState('')
-    const [accessToken, setAccessToken] = useState('')
+    const [password, setPassword] = useState('')
+    const navigate = useNavigate
     
     const handleSubmit = async(event) => {
         event.preventDefault()
         try {
-            const res = await axios.post('/api/v1/login', {
-                email, password
-            })
-            setAccessToken(res.data.accessToken)
+            const res = await axios.post('/api/v1/login', { email, password })
+            localStorage.setItem('accessToken', res.data.access_token)
+            navigate('/admin/dashboard')
         } catch(err) {
             console.log(err)
         }
@@ -21,13 +20,23 @@ const LoginForm = () => {
 
     return (
         <>
-            {accessToken ? (
-                <Dashboard accessToken={accessToken} />
-            ) : (
                 <form onSubmit={handleSubmit}>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.email)}
+                        placeholder="Email"
+                        required
+                    />
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        required
+                    />
                     <button type="submit">Login</button>
                 </form>
-            )}
         </>
     )
 }

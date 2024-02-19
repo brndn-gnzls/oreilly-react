@@ -16,6 +16,7 @@ import Sponsors from "./pages/Admin/Sponsors/Sponsors";
 import Events from "./pages/Admin/Events/Events";
 import DeleteSpeaker from "./pages/Admin/Speakers/DeleteSpeaker";
 import "./index.css";
+import LoginForm from "./pages/Admin/Dashboard/LoginForm";
 
 
 const router = createBrowserRouter([
@@ -33,6 +34,16 @@ const router = createBrowserRouter([
         path: "/admin/speakers",
         element: <ViewSpeakers />,
         // element: <CreateSpeaker />,
+      },
+      {
+        path: "/admin/login",
+        element: <LoginForm />
+        //element: <ViewSpeakers />,
+        // element: <CreateSpeaker />,
+      },
+      {
+        path: "/admin/dashboard",
+        element: <Dashboard />
       },
       {
         path: "/admin/speakers/update/:speakerId",
