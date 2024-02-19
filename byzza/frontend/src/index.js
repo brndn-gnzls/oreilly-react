@@ -27,7 +27,7 @@ const router = createBrowserRouter([
 
       {
         path: "/admin/dashboard",
-        //element: <Dashboard />,
+        element: <Dashboard />,
       },
       {
         path: "/admin/speakers",
