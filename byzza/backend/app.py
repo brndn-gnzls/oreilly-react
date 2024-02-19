@@ -107,7 +107,7 @@ def login():
     }), 200
 
 @app.route('/api/v1/dashboard', methods=['GET'])
-@jwt_required
+@jwt_required()
 def dashboard():
     current_user = get_jwt_identity()
     user = User.query.filter_by(user_id=current_user).first()
