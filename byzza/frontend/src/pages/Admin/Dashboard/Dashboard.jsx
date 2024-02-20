@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Dashboard = ({ accessToken }) => {
+const Dashboard = () => {
     const [email, setEmail] = useState('');
 
     useEffect(() => {

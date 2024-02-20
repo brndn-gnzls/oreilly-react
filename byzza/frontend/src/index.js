@@ -17,6 +17,7 @@ import Events from "./pages/Admin/Events/Events";
 import DeleteSpeaker from "./pages/Admin/Speakers/DeleteSpeaker";
 import "./index.css";
 import LoginForm from "./pages/Admin/Dashboard/LoginForm";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 
 const router = createBrowserRouter([
@@ -28,7 +29,11 @@ const router = createBrowserRouter([
 
       {
         path: "/admin/dashboard",
-        element: <Dashboard />,
+        element: (
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          ),
       },
       {
         path: "/admin/speakers",
