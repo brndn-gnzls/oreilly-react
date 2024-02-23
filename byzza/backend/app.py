@@ -1,27 +1,32 @@
 from asyncio import Event
 import http
-from flask import Flask, abort, jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask import Flask, abort, jsonify, request, redirect, session, jsonify
 from flask_bcrypt import bcrypt, Bcrypt
 import psycopg2
-# from models import Speaker
 from flask_sqlalchemy import SQLAlchemy, pagination
 import os
 from datetime import datetime
-from werkzeug.utils import secure_filename
-
+from flask_cors import CORS
+from datetime import timedelta
 # __name__ references the current module name.
 # Needed for path discovery.
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://app:terminal@localhost:5432/byzza"
-app.config["JWT_SECRET_KEY"] = "devtestkey"
-jwt = JWTManager(app)
+app.secret_key = 'secret_key'
+
 
 # Disable sqlalchemy operation nofication settings.
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+CORS(app, supports_credentials=True, origins='http://localhost:3000')
+
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE='None',
+    REMEMBER_COOKIE_DURATION=timedelta(days=1)
+)
 
 from datetime import datetime
 
@@ -81,45 +86,46 @@ class User(db.Model):
 
         return '<User %r>' % self.username
 
+
 #
-# login route
+# login route JWT
 #
-@app.route('/api/v1/login', methods=['POST'])
-def login():
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
+# @app.route('/api/v1/login', methods=['POST'])
+# def login():
+#     email = request.json.get('email', None)
+#     password = request.json.get('password', None)
 
-    if email is None or password is None:
-        return jsonify({
-            'message': '[!] Missing email or password...'
-        }), 400
+#     if email is None or password is None:
+#         return jsonify({
+#             'message': '[!] Missing email or password...'
+#         }), 400
 
-    user = User.query.filter_by(email=email).first()
+#     user = User.query.filter_by(email=email).first()
 
-    if user is None or not bcrypt.check_password_hash(user.password, password):
-        return jsonify({
-            'message' : '[!] Invalid email or password...'
-        }), 401
+#     if user is None or not bcrypt.check_password_hash(user.password, password):
+#         return jsonify({
+#             'message' : '[!] Invalid email or password...'
+#         }), 401
 
-    access_token = create_access_token(identity=user.user_id)
-    return jsonify({
-        'access_token': access_token
-    }), 200
+#     access_token = create_access_token(identity=user.user_id)
+#     return jsonify({
+#         'access_token': access_token
+#     }), 200
 
-@app.route('/api/v1/dashboard', methods=['GET'])
-@jwt_required()
-def dashboard():
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(user_id=current_user).first()
+# @app.route('/api/v1/dashboard', methods=['GET'])
+# @jwt_required()
+# def dashboard():
+#     current_user = get_jwt_identity()
+#     user = User.query.filter_by(user_id=current_user).first()
 
-    if not user:
-        return jsonify({
-            'message': 'User not found'
-        }), 404
+#     if not user:
+#         return jsonify({
+#             'message': 'User not found'
+#         }), 404
 
-    return jsonify({
-        'email': user.email
-    }), 200
+#     return jsonify({
+#         'email': user.email
+#     }), 200
     
 #
 # end login route
@@ -133,20 +139,81 @@ def dashboard():
 #     return jsonify([speaker.serialize() for speaker in
 #         speakers]), 200
 
-@app.route('/api/v1/speakers', methods=['GET'])
-def get_speakers():
-    page = request.args.get('page', 1, type=int)
+@app.route('/api/v1/login', methods=["POST"])
+def test_login():
+    session['test'] = 'Session is working'
+    return jsonify({'message':'logged in'})
 
-    speakers = Speaker.query.paginate(page=page, per_page=5, error_out=False)
+@app.route('/api/v1/dashboard', methods=['GET'])
+def test_session():
+    test_value = session.get('test', 'No session found')
+    return jsonify({'test_value': test_value})
 
-    if not speakers.items:
-        return jsonify({"error":"[-] No speakers found."}), 404
 
-    return jsonify({
-        'speakers': [speaker.serialize() for speaker in speakers.items],
-        'total_pages': speakers.pages,
-        'total_items': speakers.total
-    }), 200
+# @app.route('/api/v1/login', methods=['POST'])
+# def login():
+#     email = request.json.get('email')
+#     password = request.json.get('password')
+
+#     if not email or not password:
+#         return jsonify({
+#             'message': '[!] Missing email or password...'
+#         }), 400
+
+#     user = User.query.filter_by(email=email).first()
+#     if user and bcrypt.check_password_hash(user.password, password):
+#         session['user_id'] = user.user_id
+#         print(session)
+#         return jsonify({
+#             'message': 'Login Successful'
+#         }), 200
+#     else:
+#         return jsonify({
+#             'message': '[!] Invalid email password...'
+#         }), 401
+
+# @app.route('/api/v1/dashboard', methods=['GET'])
+# def dashboard():
+#     user_id = session.get('user_id')
+#     print(session)
+  
+#     if not user_id:
+#         return jsonify({
+#             'message': '[-] User not authenticated.'
+#         }), 401
+
+#     user = User.query.filter_by(user_id=user_id).first()
+#     if not user:
+#         return jsonify({
+#             'message': '[-] User not found.'
+#         }),404
+
+#     return jsonify({
+#         'email': user.email
+#     }), 200
+
+# # Do logout
+# @app.route('/api/v1/logout', methods=['POST'])
+# def logout():
+#     session.pop('user_id', None)
+#     return jsonify({
+#         'message' : 'Loggedout successfully'
+#     }), 200
+
+# @app.route('/api/v1/speakers', methods=['GET'])
+# def get_speakers():
+#     page = request.args.get('page', 1, type=int)
+
+#     speakers = Speaker.query.paginate(page=page, per_page=5, error_out=False)
+
+#     if not speakers.items:
+#         return jsonify({"error":"[-] No speakers found."}), 404
+
+#     return jsonify({
+#         'speakers': [speaker.serialize() for speaker in speakers.items],
+#         'total_pages': speakers.pages,
+#         'total_items': speakers.total
+#     }), 200
 
 
 @app.route('/api/v1/speakers/<int:speaker_id>', methods=['GET'])
@@ -260,4 +327,4 @@ def delete_speaker(speaker_id):
 
 # app.py is the main program.
 if __name__ == "__main__":
-    app.run()
+    app.run(ssl_context=('/Users/AE06909/certs/cert.pem', '/Users/AE06909/certs/key.pem'))
